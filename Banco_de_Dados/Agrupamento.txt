@@ -1,0 +1,31 @@
+Grupo 1 - Ativo:
+1 - Ativo
+
+Grupo 2 - Formado:
+1024 - Formado
+
+Grupo 3 - Desligado - Culpa do Aluno:
+2 - Deslig - Não Cumpriu Condição
+4 - Desligamento - Abandono
+32 - Desligamento Jubilamento
+128 - Desligamento Voluntário
+32768 - Repr 3 Vezes Na Mesma Disc Obr
+
+Grupo 4 - Desligado - Questão Externa:
+8 - Desligamento Decisão  Judicial ****
+16 - Desligamento Falt Documentação ****
+64 - Desligamento Por Força De Intercãmbio ****
+256 - Desligamento-Força De Convênio ****
+
+
+Grupo 5 - Mudança de Curso/Turno/Universidade:
+2048 - Mudança De Curso ****
+4096 - Mudança De Turno ****
+65536 - Transferência ****
+131072 - Vestibular P/Outra Habilitação ****
+
+
+Grupo 6 - Outros:
+512 - Falecimento ****
+16384 - Outros ****
+8192 - Novo Vestibular ****
