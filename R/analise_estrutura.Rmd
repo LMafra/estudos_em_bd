@@ -1,0 +1,56 @@
+---
+title: "Inspecionar estrutura do database"
+---
+
+
+
+```{r}
+library(readxl)
+library(stringr)
+library(dplyr)
+
+```
+
+
+```{r}
+ata <- read.delim("novos_dados1.csv", stringsAsFactors=FALSE)
+```
+
+```{r}
+dim(ata)
+class(ata)
+colnames(ata)
+```
+
+```{r}
+summary(ata)
+```
+atenção para o crédito da disciplina, tem, no minimo, uma matérica com o valor de 60 créditos, verificar se o valor certo é 6
+
+```{r}
+str(ata)
+```
+
+
+```{r}
+sum(is.na(ata))
+```
+Não tem nenhum dado em branco
+
+```{r}
+ind <- which(ata$Créditos.disciplina == 60.000)
+ata[ind, ]
+```
+tem 2 disciplinas diferentes com 60 créditos: Estágio de internato 1 em medicina geral, estagio de internato 2 em medicina geral
+(wtf esses alunos tao fazendo essa matéria???)
+
+```{r}
+ind <- select(ata, ID.Aluno, Nome.da.disciplina)
+head(ind)
+ind <- which(ata$ID.Aluno == 'Aluno 100009')
+ata[ind, ]
+```
+
+
+
+

@@ -1,0 +1,169 @@
+---
+title: "plotagem"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+library(jsonlite)
+library(ggplot2)
+library(readxl)
+library(dplyr)
+library(tidyr) 
+
+```
+
+
+```{r}
+ggplot(meninas_unicas, aes(x = factor(Cotista), y = factor(Raça), col=factor(Curso))) +
+  geom_jitter(alpha = 0.2)
+```
+
+
+```{r}
+ggplot(meninas_unicas, aes(x = factor(Cotista), y = factor(Tipo.de.Escola ), col=factor(Curso))) +
+  geom_jitter(alpha = 0.2)
+```
+
+Os gráficos abaixo mostram uma análise quantitativa da frequencia dos alunos cotistas.
+
+```{r}
+cotista = filter(meninas_unicas, factor(Cotista)=='Sim')
+
+ggplot(data=cotista, aes(factor(Raça))) +
+  geom_histogram(stat = "count", fill = "#4286f4", alpha = 0.8) +
+  stat_count(aes(y=..count.., label=..count..), geom="text", vjust=-.5) +
+  xlab("Raça") + ylab("Frequência")
+```
+
+```{r}
+ggplot(cotista, aes(factor(Periodo.de.Ingresso.na.Unb))) +
+  geom_histogram(stat = "count", fill = "#4286f4", alpha = 0.8) +
+  stat_count(aes(y=..count.., label=..count..), geom="text", vjust=-.5) +
+  facet_wrap(~factor(Raça)) +
+  theme(axis.text.x = element_text(size = rel(1), angle = 90))
+
+
+ggplot(cotista, aes(factor(Periodo.de.ingresso.na.opção))) +
+  geom_histogram(stat = "count", fill = "#4286f4", alpha = 0.8) +
+  stat_count(aes(y=..count.., label=..count..), geom="text", vjust=-.5) +
+  facet_wrap(~factor(Raça)) +
+  theme(axis.text.x = element_text(size = rel(1), angle = 90))
+```
+
+
+
+
+
+```{r}
+ggplot(data=cotista, aes(factor(Tipo.de.Escola))) +
+  geom_histogram(stat = "count", fill = "#4286f4", alpha = 0.8) +
+  stat_count(aes(y=..count.., label=..count..), geom="text", vjust=-.5) +
+  xlab("Tipo de Escola") + ylab("Frequência")
+```
+
+
+
+
+
+```{r}
+ggplot(meninas_unicas, aes(x = factor(Opção), y = factor(Curso))) +
+  geom_jitter(alpha = 0.2) +
+  theme(axis.text.x = element_text(size = rel(0.7), angle = 90))
+```
+
+
+```{r}
+saidos <- filter(meninas_unicas, Período.de.saída.da.opção!=0)
+
+ggplot(saidos, aes(y = factor(Forma.de.saída.da.opção ), x = factor(Período.de.saída.da.opção ))) +
+  geom_point(alpha = 0.2) + geom_smooth() +
+  theme(axis.text.x = element_text(size = rel(1), angle = 90))
+```
+
+
+```{r}
+ggplot(data=saidos, aes(x=factor(Período.de.saída.da.opção), y=factor(Forma.de.saída.da.opção), col=factor(Curso))) +
+geom_line(aes(group = factor(Forma.de.saída.da.opção))) + 
+labs(title = "Ano de saida\n", x = "Ano", y = "Forma de saida", color = "Curso\n") +
+  theme(axis.text.x = element_text(size = rel(0.5), angle = 90))
+```
+
+
+```{r}
+ggplot(saidos, aes(factor(Período.de.saída.da.opção), factor(Forma.de.saída.da.opção))) +
+  geom_line(aes(group = factor(Forma.de.saída.da.opção))) + 
+  facet_wrap(~factor(Curso)) +
+  theme(axis.text.x = element_text(size = rel(0.5), angle = 90))
+```
+
+
+
+
+
+```{r}
+ggplot(data=saidos, aes(x=factor(Período.de.saída.da.opção), y=factor(Forma.de.saída.da.opção))) +
+geom_line(aes(group = factor(Forma.de.saída.da.opção))) + 
+labs(title = "Ano Vs Forma de saida\n", x = "Ano", y = "Forma de saida", color = "Curso\n") +
+  theme(axis.text.x = element_text(size = rel(1), angle = 90))
+```
+plotar a diagonal perfeita por curso
+utilizar col para cotas (saber se demora mais ou n)
+
+```{r}
+ggplot(saidos, aes(x = factor(Período.de.saída.da.opção ), y = factor(Periodo.de.ingresso.na.opção ))) +
+  geom_point() + geom_smooth() +
+  theme(axis.text.x = element_text(size = rel(1), angle = 90))
+
+```
+
+
+```{r}
+ggplot(saidos, aes(x = factor(Período.de.saída.da.opção ), y = factor(Periodo.de.ingresso.na.opção ))) +
+  geom_jitter(alpha = 0.2) + geom_smooth() +
+  facet_wrap(~factor(Cotista)) +
+  theme(axis.text.x = element_text(size = rel(1), angle = 90))
+
+```
+
+
+
+
+```{r}
+ggplot(data=saidos, aes(x=factor(Periodo.de.ingresso.na.opção), y=factor(Período.de.saída.da.opção))) +
+geom_line(aes(group = factor(Forma.de.saída.da.opção))) + 
+  facet_wrap(~factor(Curso)) +
+labs(title = "Ano de saida\n", x = "Periodo de ingresso", y = "Periodo de saida", color = "Forma de saida\n") +
+theme(axis.text.x = element_text(size = rel(0.7), angle = 90), axis.text.y = element_text(size = rel(0.5)))
+```
+
+
+
+
+```{r}
+ggplot(data=meninas_unicas, aes(factor(Periodo.de.ingresso.na.opção))) +
+  geom_histogram(stat = "count", fill = "#4286f4", alpha = 0.8) +
+  stat_count(aes(y=..count.., label=..count..), geom="text", vjust=-.5) +
+  xlab("ano de ingresso") + ylab("Frequência") +
+  theme(axis.text.x = element_text(size = rel(1), angle = 90))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

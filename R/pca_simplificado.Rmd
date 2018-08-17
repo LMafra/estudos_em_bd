@@ -1,0 +1,39 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(factoextra)
+meninas_simplificado <- meninas_unicas
+```
+
+```{r}
+str(meninas_simplificado)
+```
+
+
+
+```{r}
+res.pca.simp <- prcomp(meninas_simplificado, scale = TRUE)
+fviz_eig(res.pca.simp)
+```
+
+
+```{r}
+dim(meninas_simplificado)
+str(meninas_simplificado)
+levels(meninas_simplificado$Forma.de.saída.da.opção)
+```
+
+
+```{r}
+groups <- as.factor(meninas_simplificado$Forma.de.saída.da.opção)
+fviz_pca_ind(res.pca.simp,
+             col.ind = groups, # color by groups
+             addEllipses = TRUE, # Concentration ellipses
+             ellipse.type = "confidence",
+             legend.title = "Groups",
+             repel = FALSE,
+             )
+```

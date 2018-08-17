@@ -1,0 +1,33 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+https://rpubs.com/melinatarituba/353262
+
+```{r}
+numerico <- meninas_unicas[,4:14]
+```
+
+
+
+```{r}
+knitr::kable(cor(numerico))
+```
+```{r}
+pairs(numerico)
+```
+
+
+```{r}
+library(corrplot)
+# primeiro fazemos a matriz de correlação
+M <- cor(numerico)
+corrplot(M, method = "circle")
+
+```
+
+```{r}
+corrplot(M, order = "hclust", addrect = 3, tl.pos="d")
+```
+
+

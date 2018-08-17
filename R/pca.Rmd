@@ -1,0 +1,169 @@
+---
+title: "PCA"
+output: pdf_document
+---
+
+
+SITE: http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/118-principal-component-analysis-in-r-prcomp-vs-princomp/
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(factoextra)
+```
+
+
+
+
+Iremos analisar a base de dados "meninas_unicas" obtidas do arquivo analise_estrutura.Rmd
+```{r}
+str(meninas_unicas)
+```
+
+
+```{r}
+meninas_unicas$UF.de.Nascimento <- as.factor(meninas_unicas$UF.de.Nascimento)
+meninas_unicas$Cotista <- as.factor(meninas_unicas$Cotista)
+meninas_unicas$Tipo.de.Escola <- as.factor(meninas_unicas$Tipo.de.Escola)
+meninas_unicas$Raça <- as.factor(meninas_unicas$Raça)
+meninas_unicas$Curso <- as.factor(meninas_unicas$Curso)
+meninas_unicas$Opção <- as.factor(meninas_unicas$Opção)
+meninas_unicas$Forma.de.Ingresso.na.UnB <- as.factor(meninas_unicas$Forma.de.Ingresso.na.UnB)
+meninas_unicas$Forma.de.saída.da.opção <- as.factor(meninas_unicas$Forma.de.saída.da.opção)
+```
+
+
+
+
+transformar os fatores em numeros
+(DEVE SER NUMERICO)
+```{r}
+meninas_unicas$UF.de.Nascimento <- sapply(as.factor(meninas_unicas$UF.de.Nascimento), as.numeric)
+meninas_unicas$Cotista <- sapply(as.factor(meninas_unicas$Cotista), as.numeric)
+meninas_unicas$Tipo.de.Escola <- sapply(as.factor(meninas_unicas$Tipo.de.Escola), as.numeric)
+meninas_unicas$Raça <- sapply(as.factor(meninas_unicas$Raça), as.numeric)
+meninas_unicas$Curso <- sapply(as.factor(meninas_unicas$Curso), as.numeric)
+meninas_unicas$Opção <- sapply(as.factor(meninas_unicas$Opção), as.numeric)
+meninas_unicas$Forma.de.Ingresso.na.UnB <- sapply(as.factor(meninas_unicas$Forma.de.Ingresso.na.UnB), as.numeric)
+meninas_unicas$Forma.de.saída.da.opção <- sapply(as.factor(meninas_unicas$Forma.de.saída.da.opção), as.numeric)
+```
+
+
+```{r}
+str(meninas_unicas[, 4:13])
+```
+
+
+
+```{r}
+#any(is.na(log.ir))
+#sum( sapply(log.ir, which(is.infinite) )
+#dim(log.ir)
+```
+
+The function princomp() uses the spectral decomposition approach. The functions prcomp() and PCA()[FactoMineR] use the singular value decomposition (SVD).
+
+vizualizazr os eigenvalues
+
+```{r}
+res.pca <- prcomp(meninas_unicas[, 4:14], scale = TRUE)
+fviz_eig(res.pca)
+```
+
+Graph of individuals. Individuals with a similar profile are grouped together
+
+```{r}
+fviz_pca_ind(res.pca,
+             col.ind = "cos2", # Color by the quality of representation
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = FALSE     # Avoid text overlapping
+             )
+```
+
+Grafico das variáveis
+
+
+```{r}
+fviz_pca_var(res.pca,
+             col.var = "contrib", # Color by contributions to the PC
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE     # Avoid text overlapping
+             )
+```
+
+
+
+```{r}
+fviz_pca_biplot(res.pca, repel = FALSE,
+                col.var = "#2E9FDF", # Variables color
+                col.ind = "#696969"  # Individuals color
+                )
+```
+
+
+PCA result
+
+```{r}
+library(factoextra)
+# Eigenvalues
+eig.val <- get_eigenvalue(res.pca)
+eig.val
+```
+
+
+```{r}
+# Results for Variables
+res.var <- get_pca_var(res.pca)
+res.var$coord          # Coordinates
+res.var$contrib        # Contributions to the PCs
+res.var$cos2           # Quality of representation 
+# Results for individuals
+res.ind <- get_pca_ind(res.pca)
+res.ind$coord          # Coordinates
+res.ind$contrib        # Contributions to the PCs
+res.ind$cos2           # Quality of representation 
+```
+
+
+#Variáveis Categóricas
+Qualitative / categorical variables can be used to color individuals by groups. The grouping variable should be of same length as the number of active individuals (here 23).
+
+```{r}
+groups <- as.factor(meninas_unicas_u$Forma.de.saída.da.opção)
+fviz_pca_ind(res.pca,
+             col.ind = groups, # color by groups
+             addEllipses = TRUE, # Concentration ellipses
+             ellipse.type = "confidence",
+             legend.title = "Groups",
+             repel = FALSE
+             )
+```
+
+Calculate the coordinates for the levels of grouping variables. The coordinates for a given group is calculated as the mean coordinates of the individuals in the group.
+
+```{r}
+library(magrittr) # for pipe %>%
+library(dplyr)   # everything else
+# 1. Individual coordinates
+res.ind <- get_pca_ind(res.pca)
+# 2. Coordinate of groups
+coord.groups <- res.ind$coord %>%
+  as_data_frame() %>%
+  select(Dim.1, Dim.2) %>%
+  mutate(competition = groups) %>%
+  group_by(competition) %>%
+  summarise(
+    Dim.1 = mean(Dim.1),
+    Dim.2 = mean(Dim.2)
+    )
+coord.groups
+```
+
+
+
+```{r}
+princomp(meninas_unicas[, 4:13], cor = FALSE, scores = TRUE)
+```
+

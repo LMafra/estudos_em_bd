@@ -1,0 +1,113 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+problemas q devem ser arrumados: arrumar o curso q tah escrito errado
+```{r}
+for ( i in 0:length(ata$Curso)) {
+  ata$Curso[i] <- str_trim(ata$Curso[i])
+  ata$Curso[i] <- str_replace_all(ata$Curso[i], "Engenharia de Redes de Comunica��o", 'Engenharia de Redes de Comunicação')
+}
+```
+
+arrumar curso
+```{r}
+for ( i in 0:length(ata$Opção)) {
+  ata$Opção[i] <- str_trim(ata$Opção[i])
+  ata$Opção[i] <- str_replace_all(ata$Opção[i], "Engenharia de Redes de Comunica��o|ENGENHARIA DE REDES DE COMUNICA��O", 'Engenharia de Redes de Comunicação')
+  ata$Opção[i] <- str_replace_all(ata$Opção[i], "CIÊNCIA DA COMPUTAÇÂO", 'Ciência da Computação')
+  ata$Opção[i] <- str_replace_all(ata$Opção[i], "Engenharia de Controle e Automação", 'Engenharia Mecatrônica')
+}
+```
+
+arrumar forma de saida
+```{r}
+for ( i in 0:length(ata$Forma.de.saída.da.opção)) {
+  ata$Forma.de.saída.da.opção[i] <- str_trim(ata$Forma.de.saída.da.opção[i])
+  ata$Forma.de.saída.da.opção[i] <- str_replace_all(ata$Forma.de.saída.da.opção[i], "Novo Vestibular|Deslig.*|Mudan�a de Curso|Transferencia|Vestibular p/outra Habilita��o|Mudan�a de Turno|Repr 3 vezes na mesma disc obr", 'Saiu')
+}
+```
+
+tirar a palavra Aluno do Id aluno
+```{r}
+length(ata$ID.Aluno)
+for ( i in 0:length(ata$ID.Aluno)) {
+  ata$ID.Aluno[i] <- str_replace_all(ata$ID.Aluno[i], "Aluno ", '')
+}
+```
+
+
+normalizar os dados
+  variaveis binarias
+
+
+
+separar em tabelas
+
+```{r}
+alunos <- select(ata, 1:14, 17:20)
+materias <- select(ata, 22:24)
+materia_aluno <- select(ata, 1, 15, 16, 22, 25, 21)
+```
+
+```{r}
+str(materia_aluno)
+```
+
+
+
+separar em meninos e meninas
+```{r}
+meninas <- filter(alunos, Sexo == 'F')
+meninos <-filter(alunos, Sexo == 'M')
+```
+ver o que deve utilizar para selecionar soh as meninas, se é select/filter/outro
+
+
+```{r}
+str(meninas)
+```
+```{r}
+summary(meninas)
+```
+
+
+
+tirar valores duplicados
+```{r}
+meninas_unicas_u <- unique(meninas)
+meninas_unicas <- meninas_unicas_u
+```
+
+
+
+
+
+
+
+
+
+
+
+verificar os cursos
+```{r}
+unique(select(ata, Curso))
+```
+verificar opções
+```{r}
+unique(select(ata, Opção))
+```
+verificar forma de saida
+```{r}
+unique(select(ata, Forma.de.saída.da.opção))
+```
+
+
+```{r}
+write.csv(ata, "all.csv", row.names = FALSE)
+write.csv(meninas_unicas_u, "meninas.csv", row.names = FALSE)
+write.csv(materias, "materia.csv", row.names = FALSE)
+write.csv(materia_aluno, "materia_aluno.csv", row.names = FALSE)
+```
+
