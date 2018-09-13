@@ -1,0 +1,237 @@
+---
+title: "PCA_bin"
+output: pdf_document
+---
+
+
+SITE: http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/118-principal-component-analysis-in-r-prcomp-vs-princomp/
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(factoextra)
+```
+
+
+```{r}
+library(readxl)
+library(stringr)
+library(dplyr)
+
+```
+
+
+```{r}
+ata_bin <- read.delim("meninasbin.csv", stringsAsFactors=FALSE, sep=";")
+```
+
+Iremos analisar a base de dados "meninas_unicas" obtidas do arquivo analise_estrutura.Rmd
+```{r}
+str(ata_bin)
+```
+
+
+
+```{r}
+str(ata_bin[, 4:13])
+```
+
+
+
+```{r}
+#any(is.na(log.ir))
+#sum( sapply(log.ir, which(is.infinite) )
+#dim(log.ir)
+```
+
+The function princomp() uses the spectral decomposition approach. The functions prcomp() and PCA()[FactoMineR] use the singular value decomposition (SVD).
+
+vizualizazr os eigenvalues
+
+```{r}
+res_bin.pca <- prcomp(ata_bin[, 4:14], scale = TRUE)
+fviz_eig(res_bin.pca,
+         main = "",
+         xlab = "Dimensões",
+         ylab = "Porcentagem de variáveis explicadas" )
+```
+
+Graph of individuals. Individuals with a similar profile are grouped together
+
+```{r}
+fviz_pca_ind(res_bin.pca,
+             col.ind = "cos2", # Color by the quality of representation
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = FALSE     # Avoid text overlapping
+             )
+```
+
+Grafico das variáveis
+
+
+```{r}
+fviz_pca_var(res_bin.pca,
+             col.var = "contrib", # Color by contributions to the PC
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE,     # Avoid text overlapping,
+             title = "Variáveis - PCA"
+             )
+```
+
+
+
+```{r}
+fviz_pca_biplot(res_bin.pca, repel = FALSE,
+                col.var = "#2E9FDF", # Variables color
+                col.ind = "#696969"  # Individuals color
+                )
+```
+
+
+PCA result
+
+```{r}
+library(factoextra)
+# Eigenvalues
+eig_bin.val <- get_eigenvalue(res.pca)
+eig_bin.val
+```
+
+
+```{r}
+# Results for Variables
+res_bin.var <- get_pca_var(res_bin.pca)
+res_bin.var$coord          # Coordinates
+res_bin.var$contrib        # Contributions to the PCs
+res_bin.var$cos2           # Quality of representation 
+# Results for individuals
+res_bin.ind <- get_pca_ind(res_bin.pca)
+res_bin.ind$coord          # Coordinates
+res_bin.ind$contrib        # Contributions to the PCs
+res_bin.ind$cos2           # Quality of representation 
+```
+
+
+#Variáveis Categóricas
+Qualitative / categorical variables can be used to color individuals by groups. The grouping variable should be of same length as the number of active individuals (here 23).
+
+```{r}
+groups_bin <- as.factor(ata_bin$X.Forma.de.saída.da.opção.)
+fviz_pca_ind(res_bin.pca,
+             col.ind = groups_bin, # color by groups
+             addEllipses = FALSE, # Concentration ellipses
+             ellipse.type = "confidence",
+             legend.title = "Grupos",
+             title = "Individuos - PCA",
+             repel = FALSE,
+             geom = "point"
+             )
+```
+
+Calculate the coordinates for the levels of grouping variables. The coordinates for a given group is calculated as the mean coordinates of the individuals in the group.
+
+```{r}
+library(magrittr) # for pipe %>%
+library(dplyr)   # everything else
+# 1. Individual coordinates
+res_bin.ind <- get_pca_ind(res_bin.pca)
+# 2. Coordinate of groups
+coord_bin.groups <- res_bin.ind$coord %>%
+  as_data_frame() %>%
+  select(Dim.1, Dim.2) %>%
+  mutate(competition = groups_bin) %>%
+  group_by(competition) %>%
+  summarise(
+    Dim.1 = mean(Dim.1),
+    Dim.2 = mean(Dim.2)
+    )
+coord_bin.groups
+```
+
+
+
+```{r}
+meninas_leave_bin <- ata_bin %>%
+  filter(X.Forma.de.saída.da.opção. > 1)
+#meninas_unicas_u$Forma.de.saída.da.opção
+res_leave_bin.pca <- prcomp(meninas_leave_bin[, 4:14], scale = TRUE)
+fviz_eig(res_leave_bin.pca,
+         main = "",
+         xlab = "Dimensões",
+         ylab = "Porcentagem de variáveis explicadas" )
+
+```
+
+```{r}
+fviz_pca_ind(res_leave_bin.pca,
+             col.ind = "cos2", # Color by the quality of representation
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = FALSE     # Avoid text overlapping
+             )
+```
+
+
+
+
+
+
+
+```{r}
+fviz_pca_var(res_leave_bin.pca,
+             col.var = "contrib", # Color by contributions to the PC
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE,     # Avoid text overlapping,
+             title = "Variáveis - PCA"
+             )
+```
+
+
+```{r}
+groups_leave_bin <- as.factor(meninas_leave_bin$X.Forma.de.saída.da.opção.)
+fviz_pca_ind(res_leave_bin.pca,
+             axes = c(1, 2),
+             col.ind = groups_leave_bin, # color by groups
+             addEllipses = FALSE, # Concentration ellipses
+             ellipse.type = "confidence",
+             legend.title = "Grupos",
+             title = "Individuos - PCA",
+             repel = FALSE,
+             geom = "point"
+             )
+```
+
+
+
+
+```{r}
+fviz_pca_biplot(res_leave_bin.pca, 
+                # Individuals
+                axes = c(1,2),
+                geom.ind = "point",
+                fill.ind = groups_leave, col.ind = "black",
+                pointshape = 21, pointsize = 2,
+                palette = "jco",
+                addEllipses = TRUE,
+                # Variables
+                alpha.var ="contrib", col.var = "contrib",
+                repel = TRUE
+                )
+```
+
+
+```{r}
+library(rgl)
+plot3d(res_leave_bin.pca[,1:3], col=groups_leave)
+```
+
+
+
+
+
+
+
+
+
+
