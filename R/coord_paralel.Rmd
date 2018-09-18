@@ -1,0 +1,77 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+site:
+https://cran.r-project.org/web/packages/cdparcoord/vignettes/cdparcoord.html
+```{r}
+library(plotly)
+
+df <- read.csv("meninas.csv", stringsAsFactors=FALSE, sep=",")
+df_bin <- read.csv("meninasbin.csv", stringsAsFactors=FALSE, sep=";")
+```
+
+```{r}
+str(df)
+str(df[, 4:13])
+```
+
+
+```{r}
+library(cdparcoord)
+df_aux = df[, 8:14]
+df_aux <- makeFactor(df_aux,c('Período.de.saída.da.opção','Periodo.de.Ingresso.na.Unb','Periodo.de.ingresso.na.opção'))
+#pe25disc <- discretize(df_aux,nlevels=5)  
+discparcoord(df_aux,k=1000)
+```
+
+
+```{r}
+library(cdparcoord)
+df_aux_bin = df_bin[, 8:14]
+#df_aux_bin <- makeFactor(df_aux_bin,c('Período.de.saída.da.opção','Periodo.de.Ingresso.na.Unb','Periodo.de.ingresso.na.opção'))
+#pe25disc <- discretize(df_aux,nlevels=5)  
+discparcoord(df_aux_bin,k=100)
+```
+
+```{r}
+mydata <- na.omit(df_bin[, 4:17]) # listwise deletion of missing
+mydata <- scale(mydata) # standardize variables
+```
+
+```{r}
+# K-Means Cluster Analysis
+fit <- kmeans(mydata, 3) # 5 cluster solution
+# get cluster means 
+aggregate(mydata,by=list(fit$cluster),FUN=mean)
+# append cluster assignment
+mydata <- data.frame(mydata, fit$cluster)
+```
+
+```{r}
+# Cluster Plot against 1st 2 principal components
+
+# vary parameters for most readable graph
+library(cluster) 
+clusplot(mydata, fit$cluster, color=TRUE, shade=TRUE, 
+  	labels=2, lines=0)
+
+# Centroid Plot against 1st 2 discriminant functions
+library(fpc)
+plotcluster(mydata, fit$cluster)
+
+
+```
+
+
+
+
+
+
+
+

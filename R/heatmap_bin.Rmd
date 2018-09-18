@@ -27,7 +27,7 @@ corrplot(M_bin, method = "circle")
 ```
 
 ```{r}
-corrplot(M_bin, order = "hclust", addrect = 6, tl.pos="d")
+corrplot(M_bin, order = "hclust", addrect = 3, tl.pos="d")
 ```
 
 

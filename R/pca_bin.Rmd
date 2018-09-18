@@ -191,7 +191,7 @@ fviz_pca_var(res_leave_bin.pca,
 ```{r}
 groups_leave_bin <- as.factor(meninas_leave_bin$X.Forma.de.saída.da.opção.)
 fviz_pca_ind(res_leave_bin.pca,
-             axes = c(1, 2),
+             axes = c(2, 3),
              col.ind = groups_leave_bin, # color by groups
              addEllipses = FALSE, # Concentration ellipses
              ellipse.type = "confidence",
